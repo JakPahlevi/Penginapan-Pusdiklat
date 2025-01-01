@@ -80,10 +80,44 @@ class BoardingHouseResource extends Resource
                                     ]),
                             ]),
 
+                        Forms\Components\Tabs\Tab::make('Kamar')
+                            ->schema([
+                                Forms\Components\Repeater::make('rooms')
+                                    ->relationship('rooms')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('name')
+                                            ->required(),
 
+                                        Forms\Components\TextInput::make('room_type')
+                                            ->required(),
+
+                                        Forms\Components\TextInput::make('square_feet')
+                                            ->numeric()
+                                            ->required(),
+
+                                        Forms\Components\TextInput::make('capacity')
+                                            ->numeric()
+                                            ->required(),
+
+                                        Forms\Components\TextInput::make('price_per_month')
+                                            ->numeric()
+                                            ->prefix('IDR')
+                                            ->required(),
+
+                                        Forms\Components\Toggle::make('is_available')
+                                            ->required(),
+
+                                        Forms\Components\Repeater::make('images')
+                                            ->relationship('images')
+                                            ->schema([
+                                                Forms\Components\FileUpload::make('image')
+                                                    ->directory('rooms')
+                                                    ->required(),
+                                            ]),
+                                    ]),
+                            ]),
                     ])
                     ->columnSpan(2),
-
             ]);
     }
 
