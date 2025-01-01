@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class BoardingHouse extends Model
@@ -14,7 +15,7 @@ class BoardingHouse extends Model
         'thumbnail',
         'city_id',
         'category_id',
-        'description’,
+        'description',
         'price',
         'address',
     ];
@@ -48,5 +49,4 @@ class BoardingHouse extends Model
     {
         return $this->hasMany(Transaction::class);
     }
-
 }
