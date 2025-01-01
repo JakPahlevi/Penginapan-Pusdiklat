@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Room extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'boarding_house_id',
@@ -26,7 +27,7 @@ class Room extends Model
 
     public function images()
     {
-        return $this->hasMany(RoomImages::class);
+        return $this->hasMany(RoomImage::class);
     }
 
     public function transactions()
