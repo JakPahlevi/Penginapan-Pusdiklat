@@ -67,8 +67,10 @@ class BoardingHouseResource extends Resource
                         Forms\Components\Tabs\Tab::make('Bonus Kamar')
                             ->schema([
                                 Forms\Components\Repeater::make('bonuses')
+                                    ->relationship('bonuses')
                                     ->schema([
                                         Forms\Components\FileUpload::make('image')
+                                            ->image()
                                             ->directory('bonuses')
                                             ->required(),
 
