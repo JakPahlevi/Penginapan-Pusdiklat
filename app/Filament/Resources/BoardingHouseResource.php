@@ -128,14 +128,56 @@ class BoardingHouseResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name'),
-                Tables\Columns\TextColumn::make('city.name'),
-                Tables\Columns\TextColumn::make('category.name'),
-                Tables\Columns\TextColumn::make('price'),
-                Tables\Columns\ImageColumn::make('thumbnail'),
+                Tables\Columns\TextColumn::make('name')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('city.name')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('category.name')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('price')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\ImageColumn::make('thumbnail')
             ])
             ->filters([
-                // Tambahkan filter di sini jika diperlukan
+                Tables\Filters\SelectFilter::make('city')
+                    ->relationship('city', 'name'),
+
+                Tables\Filters\SelectFilter::make('category')
+                    ->relationship('category', 'name'),
+
+                Tables\Filters\Filter::make('price_range')
+                    ->form([
+                        Forms\Components\TextInput::make('price_from')
+                            ->numeric()
+                            ->label('Minimum Price')
+                            ->prefix('IDR'),
+                        Forms\Components\TextInput::make('price_to')
+                            ->numeric()
+                            ->label('Maximum Price')
+                            ->prefix('IDR'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['price_from'],
+                                fn(Builder $query, $price): Builder => $query->where('price', '>=', $price),
+                            )
+                            ->when(
+                                $data['price_to'],
+                                fn(Builder $query, $price): Builder => $query->where('price', '<=', $price),
+                            );
+                    }),
+
+                Tables\Filters\TernaryFilter::make('is_available')
+                    ->queries(
+                        true: fn(Builder $query) => $query->whereHas('rooms', fn($query) => $query->where('is_available', true)),
+                        false: fn(Builder $query) => $query->whereHas('rooms', fn($query) => $query->where('is_available', false)),
+                        blank: fn(Builder $query) => $query
+                    ),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),

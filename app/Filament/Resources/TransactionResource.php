@@ -84,17 +84,93 @@ class TransactionResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('code'),
-                Tables\Columns\TextColumn::make('boardingHouse.name'),
-                Tables\Columns\TextColumn::make('room.name'),
-                Tables\Columns\TextColumn::make('name'),
-                Tables\Columns\TextColumn::make('payment_method'),
-                Tables\Columns\TextColumn::make('payment_status'),
-                Tables\Columns\TextColumn::make('total_amount'),
-                Tables\Columns\TextColumn::make('transaction_date'),
+                Tables\Columns\TextColumn::make('code')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('boardingHouse.name')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('room.name')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('name')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('payment_method')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('payment_status')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('total_amount')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('transaction_date')
+                    ->searchable()
+                    ->sortable(),
             ])
             ->filters([
-                // Tambahkan filter jika diperlukan
+                Tables\Filters\SelectFilter::make('boarding_house')
+                    ->relationship('boardingHouse', 'name')
+                    ->label('Boarding House'),
+
+                Tables\Filters\SelectFilter::make('room')
+                    ->relationship('room', 'name')
+                    ->label('Room'),
+
+                Tables\Filters\SelectFilter::make('payment_method')
+                    ->options([
+                        'full_payment' => 'Full Payment',
+                        'down_payment' => 'Down Payment',
+                    ]),
+
+                Tables\Filters\SelectFilter::make('payment_status')
+                    ->options([
+                        'pending' => 'Pending',
+                        'paid' => 'Paid',
+                    ]),
+
+                Tables\Filters\Filter::make('amount_range')
+                    ->form([
+                        Forms\Components\TextInput::make('amount_from')
+                            ->numeric()
+                            ->label('Minimum Amount')
+                            ->prefix('IDR'),
+                        Forms\Components\TextInput::make('amount_to')
+                            ->numeric()
+                            ->label('Maximum Amount')
+                            ->prefix('IDR'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['amount_from'],
+                                fn(Builder $query, $amount): Builder => $query->where('total_amount', '>=', $amount),
+                            )
+                            ->when(
+                                $data['amount_to'],
+                                fn(Builder $query, $amount): Builder => $query->where('total_amount', '<=', $amount),
+                            );
+                    }),
+
+                Tables\Filters\Filter::make('date_range')
+                    ->form([
+                        Forms\Components\DatePicker::make('created_from')
+                            ->label('From Date'),
+                        Forms\Components\DatePicker::make('created_until')
+                            ->label('Until Date'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['created_from'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('transaction_date', '>=', $date),
+                            )
+                            ->when(
+                                $data['created_until'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('transaction_date', '<=', $date),
+                            );
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

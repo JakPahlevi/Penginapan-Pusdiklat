@@ -55,14 +55,78 @@ class TestimonialResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('photo'),
-                Tables\Columns\TextColumn::make('boardingHouse.name'),
-                Tables\Columns\TextColumn::make('name'),
-                Tables\Columns\TextColumn::make('content'),
-                Tables\Columns\TextColumn::make('rating'),
+                Tables\Columns\ImageColumn::make('photo')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('boardingHouse.name')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('name')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('content')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('rating')
+                    ->searchable()
+                    ->sortable(),
             ])
             ->filters([
-                // Tambahkan filter jika diperlukan
+                Tables\Filters\SelectFilter::make('boarding_house')
+                    ->relationship('boardingHouse', 'name')
+                    ->label('Boarding House'),
+
+                Tables\Filters\Filter::make('rating_range')
+                    ->form([
+                        Forms\Components\Select::make('rating_from')
+                            ->options([
+                                1 => '1 Star',
+                                2 => '2 Stars',
+                                3 => '3 Stars',
+                                4 => '4 Stars',
+                                5 => '5 Stars',
+                            ])
+                            ->label('Minimum Rating'),
+                        Forms\Components\Select::make('rating_to')
+                            ->options([
+                                1 => '1 Star',
+                                2 => '2 Stars',
+                                3 => '3 Stars',
+                                4 => '4 Stars',
+                                5 => '5 Stars',
+                            ])
+                            ->label('Maximum Rating'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['rating_from'],
+                                fn(Builder $query, $rating): Builder => $query->where('rating', '>=', $rating),
+                            )
+                            ->when(
+                                $data['rating_to'],
+                                fn(Builder $query, $rating): Builder => $query->where('rating', '<=', $rating),
+                            );
+                    }),
+
+                Tables\Filters\Filter::make('date_range')
+                    ->form([
+                        Forms\Components\DatePicker::make('created_from')
+                            ->label('From Date'),
+                        Forms\Components\DatePicker::make('created_until')
+                            ->label('Until Date'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['created_from'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['created_until'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                            );
+                    }),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
