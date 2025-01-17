@@ -27,4 +27,8 @@ class Room extends Model
     {
         return $this->hasMany(RoomImage::class);
     }
+    public function roomUnitNumbers()
+    {
+        return $this->hasMany(RoomUnitNumber::class);
+    }
 }

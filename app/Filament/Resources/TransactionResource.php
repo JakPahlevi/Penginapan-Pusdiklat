@@ -37,7 +37,7 @@ class TransactionResource extends Resource
                 Forms\Components\TextInput::make('email')
                     ->email()
                     ->required(),
-                Forms\Components\TextInput::make('phone')
+                Forms\Components\TextInput::make('phone_number')
                     ->required(),
                 Forms\Components\Select::make('payment_method')
                     ->options([
@@ -45,11 +45,7 @@ class TransactionResource extends Resource
                         'full_payment' => 'full_payment',
                     ])
                     ->required(),
-                Forms\Components\Select::make('payment_status')
-                    ->options([
-                        'pending' => 'pending',
-                        'paid' => 'paid',
-                    ])
+                Forms\Components\TextInput::make('payment_status')
                     ->required(),
                 Forms\Components\DatePicker::make('start_date')
                     ->required(),
@@ -74,7 +70,7 @@ class TransactionResource extends Resource
                 Tables\Columns\TextColumn::make('room.name'),
                 Tables\Columns\TextColumn::make('name'),
                 Tables\Columns\TextColumn::make('email'),
-                Tables\Columns\TextColumn::make('phone'),
+                Tables\Columns\TextColumn::make('phone_number'),
                 Tables\Columns\TextColumn::make('payment_method'),
                 Tables\Columns\TextColumn::make('payment_status'),
                 Tables\Columns\TextColumn::make('total_amount'),
@@ -84,7 +80,9 @@ class TransactionResource extends Resource
                 //
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

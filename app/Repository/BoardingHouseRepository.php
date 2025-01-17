@@ -4,7 +4,8 @@ namespace App\Repository;
 
 use App\Interfaces\BoardingHouseRepositoryInterface;
 use App\Models\BoardingHouse;
-use Filament\Forms\Components\Builder;
+use App\Models\Room;
+use Illuminate\Database\Eloquent\Builder;
 
 class BoardingHouseRepository implements BoardingHouseRepositoryInterface
 {
@@ -22,7 +23,7 @@ class BoardingHouseRepository implements BoardingHouseRepositoryInterface
             });
         }
         if ($category) {
-            $query->whereHas('category', function (builder $query) use ($category) {
+            $query->whereHas('category', function (Builder $query) use ($category) {
                 $query->where('slug', $category);
             });
         }
@@ -47,5 +48,15 @@ class BoardingHouseRepository implements BoardingHouseRepositoryInterface
     public function getBoardingHouseBySlug($slug)
     {
         return BoardingHouse::where('slug', $slug)->first();
+    }
+
+    public function getBoardingHouseRoomById($id)
+    {
+        return Room::find($id);
+    }
+
+    public function getShowAllBoardingHouse()
+    {
+        return BoardingHouse::all();
     }
 }

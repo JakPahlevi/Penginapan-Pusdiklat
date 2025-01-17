@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('phone_number');
             $table->enum('payment_method', ['down_payment', 'full_payment'])->nullable();
             $table->string('payment_status')->nullable();
-            $table->date('date-start');
+            $table->date('start_date');
             $table->integer('duration');
             $table->integer('total_amount')->nullable();
             $table->date('transaction_date')->nullable();
